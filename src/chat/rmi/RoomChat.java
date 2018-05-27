@@ -1,7 +1,5 @@
 package chat.rmi;
 
-import java.io.Serializable;
-import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -42,6 +40,15 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
 
     @Override
     public void joinRoom(String usrName) throws RemoteException {
+        
+        List<String> usrsOnline = new ArrayList();
+        for(IUserChat usr : usrList){
+            usrsOnline.add(usr.getUsrName());
+        }
+        if(usrsOnline.contains(usrName)){
+            return; // Usuario não pode entrar duas vezes na mesma sala
+        }
+        
         try {
             IUserChat user = (IUserChat) registry.lookup(Definitions.userBindPrefix + usrName);
             usrList.add(user);

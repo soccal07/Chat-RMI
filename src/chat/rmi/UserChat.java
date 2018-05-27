@@ -25,10 +25,12 @@ public class UserChat extends UnicastRemoteObject implements IUserChat{
         }
     }
 
+    @Override
     public String getUsrName() {
         return usrName;
     }
     
+    @Override
     public void setUsrName(String usrName) throws RemoteException{
         this.usrName = usrName;
         try {

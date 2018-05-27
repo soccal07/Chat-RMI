@@ -78,8 +78,13 @@ public class UserChatController implements Initializable {
     void btnNewRoomAction(ActionEvent event) throws RemoteException {
         
         if(!"none".equals(userChat.getUsrName())){
+            
             String roomName = txtNewRoomName.getText();
-            if(!roomName.isEmpty()) {
+            List<String> allRooms = new ArrayList();
+            for(IRoomChat rc: roomList){
+                allRooms.add(rc.getRoomName());
+            }
+            if(!roomName.isEmpty() && !allRooms.contains(roomName)) {
                 try {
                     iServerChat.createRoom(roomName);
                 } catch (RemoteException ex) {
@@ -90,6 +95,11 @@ public class UserChatController implements Initializable {
                 } finally {
                     txtNewRoomName.clear();
                 }
+            } else {
+                Alert alert;
+                alert = new Alert(Alert.AlertType.WARNING);
+                alert.setContentText("Invalid Room name!");
+                alert.show();
             }
         } else {
             Alert alert;
@@ -174,11 +184,15 @@ public class UserChatController implements Initializable {
     }
     
     @FXML
-    void btnSetNameAction(ActionEvent event) throws RemoteException {
+    void btnSetNameAction(ActionEvent event) {
         
         String usrName = txtUserName.getText();
         if(!usrName.isEmpty()){
-            userChat.setUsrName(usrName);
+            try {
+                userChat.setUsrName(usrName);
+            } catch (RemoteException ex) {
+                Logger.getLogger(UserChatController.class.getName()).log(Level.SEVERE, null, ex);
+            }
             txtUserName.visibleProperty().setValue(Boolean.FALSE);
             txtUserName.disableProperty().setValue(Boolean.TRUE);
             btnSetName.visibleProperty().setValue(Boolean.FALSE);
