@@ -7,12 +7,15 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.control.TextArea;
+import javax.swing.JTextArea;
 
 
 public class UserChat extends UnicastRemoteObject implements IUserChat{
     
     private String usrName;
     private Registry registry;
+    public TextArea chatArea;
 
     public UserChat() throws RemoteException{
         super();
@@ -43,7 +46,8 @@ public class UserChat extends UnicastRemoteObject implements IUserChat{
     
     @Override
     public void deliverMsg(String senderName, String msg) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        String formatedMessage = senderName + ": " + msg + "\n";
+        chatArea.setText(chatArea.getText() + formatedMessage);
     }
     
 }

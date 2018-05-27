@@ -35,7 +35,8 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
     
     @Override
     public void sendMsg(String usrName, String msg) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        for(IUserChat usr : usrList)
+            usr.deliverMsg(usrName, msg);
     }
 
     @Override
@@ -60,12 +61,24 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
 
     @Override
     public void leaveRoom(String usrName) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        for(IUserChat usr : usrList)
+        {
+            if(usr.getUsrName().equals(usrName))
+            {
+                usrList.remove(usr);
+                break;
+            }
+        }
+                
     }
 
     @Override
     public void closeRoom() throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        for(IUserChat usr : usrList){
+            usr.deliverMsg("SERVIDOR", "Sala fechada pelo servidor");
+            //leaveRoom(usr.getUsrName());
+        }
+        usrList = null;
     }
 
     @Override

@@ -130,8 +130,8 @@ public class UserChatController implements Initializable {
     }
 
     @FXML
-    void btnLeaveAction(ActionEvent event) {
-
+    void btnLeaveAction(ActionEvent event) throws RemoteException {
+        iRoomChat.leaveRoom(userChat.getUsrName());
     }
     
     void getRoomUsers(String selectedRoomName) throws RemoteException {
@@ -175,12 +175,23 @@ public class UserChatController implements Initializable {
             if(selectedRoomName != null){
                 getRoomUsers(selectedRoomName);
             }
+            else{
+                listUsersOnRoom.setItems(null);
+            }
         }
     }
 
     @FXML
     void btnSendAction(ActionEvent event) {
-        
+        String message = txtMsg.getText();
+        if(!message.isEmpty()){
+            try {
+                iRoomChat.sendMsg(userChat.getUsrName(), message);
+                txtMsg.setText("");
+            } catch (RemoteException ex) {
+                Logger.getLogger(UserChatController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
     
     @FXML
@@ -218,6 +229,7 @@ public class UserChatController implements Initializable {
             registry = LocateRegistry.getRegistry(Definitions.serverIp, 2020);
             iServerChat = (IServerChat) registry.lookup(Definitions.serverBindName);
             userChat = new UserChat();
+            userChat.chatArea = chatArea;
         } catch (RemoteException | NotBoundException ex) {
             Alert alert;
             alert = new Alert(Alert.AlertType.ERROR);

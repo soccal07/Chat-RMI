@@ -44,8 +44,20 @@ public class ServerChatController implements Initializable {
 
     
     @FXML
-    void btnCloseRoomAction(ActionEvent event) {
-        
+    void btnCloseRoomAction(ActionEvent event) throws RemoteException {
+        String name = cbRooms.getValue();
+        IRoomChat room = null;
+        for(IRoomChat rc : roomList){
+            if(rc.getRoomName().equals(name)){
+                room = rc;
+                break;
+            }
+        }
+        if(room == null)
+            return;
+        room.closeRoom();
+        List<IRoomChat> rooms = serverChat.getRooms();
+        boolean a = rooms.remove(room);
     }
     
     @FXML
