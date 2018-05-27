@@ -1,18 +1,33 @@
 package chat.rmi;
 
 import java.io.Serializable;
+import java.rmi.AccessException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
-public class RoomChat implements IRoomChat, Serializable {
+public class RoomChat extends UnicastRemoteObject implements IRoomChat {
     private String roomName;
-    private List<UserChat> usrList;
+    private List<IUserChat> usrList;
+    private Registry registry;
 
-    public RoomChat(String roomName) {
+    public RoomChat(String roomName) throws RemoteException {
+        super();
         this.roomName = roomName;
         usrList = new ArrayList<>();
+        try {
+            registry = LocateRegistry.getRegistry(2020);
+            registry.bind(Definitions.roomBindPrefix + roomName, this);
+        } catch (RemoteException | AlreadyBoundException ex) {
+            Logger.getLogger(RoomChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -27,7 +42,13 @@ public class RoomChat implements IRoomChat, Serializable {
 
     @Override
     public void joinRoom(String usrName) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            IUserChat user = (IUserChat) registry.lookup(Definitions.userBindPrefix + usrName);
+            usrList.add(user);
+            System.out.println("User " + user.getUsrName() + " joined room " + roomName);
+        } catch (Exception ex) {
+            Logger.getLogger(RoomChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -42,6 +63,12 @@ public class RoomChat implements IRoomChat, Serializable {
 
     @Override
     public String getRoomName() throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return roomName;
     }
+    
+    @Override
+    public List<IUserChat> getUsrList() throws RemoteException {
+        return usrList;
+    }
+    
 }

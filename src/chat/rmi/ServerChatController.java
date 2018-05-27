@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
@@ -23,11 +24,11 @@ public class ServerChatController implements Initializable {
     Registry registry = null;
     ServerChat serverChat = null;
     IServerChat iServerChat = null;
-    private List<RoomChat> roomList = null;
-    private ObservableList<RoomChat> observableList;
+    private List<IRoomChat> roomList = null;
+    private ObservableList<String> observableList;
     
     @FXML
-    private ComboBox<RoomChat> cbRooms;
+    private ComboBox<String> cbRooms;
 
     @FXML
     private Button btnCloseRoom;
@@ -48,7 +49,7 @@ public class ServerChatController implements Initializable {
     }
     
     @FXML
-    void btnRefreshAction(ActionEvent event) {
+    void btnRefreshAction(ActionEvent event) throws RemoteException {
         try {
             roomList = iServerChat.getRooms();
         } catch (RemoteException ex) {
@@ -57,7 +58,12 @@ public class ServerChatController implements Initializable {
             alert.setContentText("Remote Exception");
             alert.show();
         } finally {
-            observableList = FXCollections.observableArrayList(roomList);
+            
+            List<String> roomNameList = new ArrayList();
+            for(IRoomChat rc : roomList){
+                roomNameList.add(rc.getRoomName());
+            }
+            observableList = FXCollections.observableArrayList(roomNameList);
             cbRooms.setItems(observableList);
         }
     }
@@ -68,7 +74,7 @@ public class ServerChatController implements Initializable {
             registry = LocateRegistry.createRegistry(2020);
             serverChat = new ServerChat();
             iServerChat = (IServerChat) UnicastRemoteObject.exportObject(serverChat, 0);
-            registry.rebind("Servidor", iServerChat);
+            registry.rebind(Definitions.serverBindName, iServerChat);
         } catch (RemoteException ex) {
             Alert alert;
             alert = new Alert(Alert.AlertType.ERROR);

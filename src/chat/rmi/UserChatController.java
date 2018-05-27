@@ -1,13 +1,17 @@
 package chat.rmi;
 
 import java.net.URL;
+import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -26,15 +30,16 @@ public class UserChatController implements Initializable {
     
     private Registry registry = null;
     private IServerChat iServerChat = null;
+    private IRoomChat iRoomChat = null;
     private UserChat userChat = null;
-    private List<RoomChat> roomList = null;
-    private ObservableList<RoomChat> observableList;
+    private List<IRoomChat> roomList = null;
+    private ObservableList<String> observableList;
     
     @FXML
-    private ComboBox<RoomChat> cmbRooms;
+    private ComboBox<String> cmbRooms;
     
     @FXML
-    private ListView<UserChat> listUsersOnRoom;
+    private ListView<String> listUsersOnRoom;
             
     @FXML
     private TextArea chatArea;
@@ -70,9 +75,9 @@ public class UserChatController implements Initializable {
     private TextField txtNewRoomName;
     
     @FXML
-    void btnNewRoomAction(ActionEvent event) {
+    void btnNewRoomAction(ActionEvent event) throws RemoteException {
         
-        if(userChat.getUsrName() != "none"){
+        if(!"none".equals(userChat.getUsrName())){
             String roomName = txtNewRoomName.getText();
             if(!roomName.isEmpty()) {
                 try {
@@ -96,13 +101,16 @@ public class UserChatController implements Initializable {
     
     @FXML
     void btnJoinAction(ActionEvent event) {
-        RoomChat selectedRoom = cmbRooms.getValue();
-        if(roomList.contains(selectedRoom)){
+        
+        String selectedRoom = cmbRooms.getValue();
+        if(selectedRoom != null){
             String roomName = selectedRoom.toString();
-            Alert alert;
-            alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setContentText(roomName);
-            alert.show();
+            try {
+                iRoomChat = (IRoomChat) registry.lookup(Definitions.roomBindPrefix + roomName);
+                iRoomChat.joinRoom(userChat.getUsrName());
+            } catch (RemoteException | NotBoundException ex) {
+                Logger.getLogger(UserChatController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else {
             Alert alert;
             alert = new Alert(Alert.AlertType.WARNING);
@@ -115,9 +123,29 @@ public class UserChatController implements Initializable {
     void btnLeaveAction(ActionEvent event) {
 
     }
+    
+    void getRoomUsers(String selectedRoomName) throws RemoteException {
+        
+        try {
+            iRoomChat = getRoomRef(selectedRoomName);
+        } catch (RemoteException ex) {
+            Logger.getLogger(UserChatController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if(iRoomChat != null && roomList.contains(iRoomChat)){
+            List<IUserChat> usrList = iRoomChat.getUsrList();
+            
+            List<String> usersNames = new ArrayList();
+            for(IUserChat usr : usrList){
+                usersNames.add(usr.getUsrName()); 
+            }
+            
+            ObservableList<String> observableListUsrs = FXCollections.observableArrayList(usersNames);
+            listUsersOnRoom.setItems(observableListUsrs);
+        }
+    }
 
     @FXML
-    void btnRefreshAction(ActionEvent event) {
+    void btnRefreshAction(ActionEvent event) throws RemoteException {
         try {
             roomList = iServerChat.getRooms();
         } catch (RemoteException ex) {
@@ -126,8 +154,17 @@ public class UserChatController implements Initializable {
             alert.setContentText("Remote Exception");
             alert.show();
         } finally {
-            observableList = FXCollections.observableArrayList(roomList);
+            List<String> roomNameList = new ArrayList();
+            for(IRoomChat rc : roomList){
+                roomNameList.add(rc.getRoomName());
+            }
+            observableList = FXCollections.observableArrayList(roomNameList);
             cmbRooms.setItems(observableList);
+            
+            String selectedRoomName = cmbRooms.getValue();
+            if(selectedRoomName != null){
+                getRoomUsers(selectedRoomName);
+            }
         }
     }
 
@@ -137,7 +174,7 @@ public class UserChatController implements Initializable {
     }
     
     @FXML
-    void btnSetNameAction(ActionEvent event) {
+    void btnSetNameAction(ActionEvent event) throws RemoteException {
         
         String usrName = txtUserName.getText();
         if(!usrName.isEmpty()){
@@ -150,11 +187,22 @@ public class UserChatController implements Initializable {
         }
     }
     
+    public IRoomChat getRoomRef(String roomName) throws RemoteException
+    { 
+        try {
+            IRoomChat stub = (IRoomChat) registry.lookup(Definitions.roomBindPrefix + roomName);
+            return stub;
+        } catch (NotBoundException | AccessException ex) {
+            Logger.getLogger(UserChatController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
-            registry = LocateRegistry.getRegistry("localhost", 2020);
-            iServerChat = (IServerChat) registry.lookup("Servidor");
+            registry = LocateRegistry.getRegistry(Definitions.serverIp, 2020);
+            iServerChat = (IServerChat) registry.lookup(Definitions.serverBindName);
             userChat = new UserChat();
         } catch (RemoteException | NotBoundException ex) {
             Alert alert;

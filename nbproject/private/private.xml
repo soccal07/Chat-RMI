@@ -5,8 +5,9 @@
         <group>
             <file>file:/C:/CC/Java/Netbeans/Chat-RMI/src/chat/rmi/ServerChat.java</file>
             <file>file:/C:/CC/Java/Netbeans/Chat-RMI/src/chat/rmi/UserChatController.java</file>
-            <file>file:/C:/CC/Java/Netbeans/Chat-RMI/src/chat/rmi/ServerChatController.java</file>
+            <file>file:/C:/CC/Java/Netbeans/Chat-RMI/src/chat/rmi/RoomChat.java</file>
             <file>file:/C:/CC/Java/Netbeans/Chat-RMI/src/chat/rmi/UserChat.java</file>
+            <file>file:/C:/CC/Java/Netbeans/Chat-RMI/src/chat/rmi/IRoomChat.java</file>
         </group>
     </open-files>
 </project-private>
