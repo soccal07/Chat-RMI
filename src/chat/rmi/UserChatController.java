@@ -17,6 +17,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
@@ -31,6 +32,9 @@ public class UserChatController implements Initializable {
     
     @FXML
     private ComboBox<RoomChat> cmbRooms;
+    
+    @FXML
+    private ListView<UserChat> listUsersOnRoom;
             
     @FXML
     private TextArea chatArea;
@@ -92,7 +96,19 @@ public class UserChatController implements Initializable {
     
     @FXML
     void btnJoinAction(ActionEvent event) {
-
+        RoomChat selectedRoom = cmbRooms.getValue();
+        if(roomList.contains(selectedRoom)){
+            String roomName = selectedRoom.toString();
+            Alert alert;
+            alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText(roomName);
+            alert.show();
+        } else {
+            Alert alert;
+            alert = new Alert(Alert.AlertType.WARNING);
+            alert.setContentText("Select a room!");
+            alert.show();
+        }
     }
 
     @FXML
