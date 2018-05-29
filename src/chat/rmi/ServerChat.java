@@ -29,10 +29,9 @@ public class ServerChat implements IServerChat{
     public void createRoom(String roomName) throws RemoteException {
         for(IRoomChat rc : roomList){
             if(rc.getRoomName().equals(roomName)){
-                return;
+                return; // Não pode ter room com nome repetido
             }
         }
-        
         try {
             RoomChat rc = new RoomChat(roomName);
             Registry registry = LocateRegistry.getRegistry(2020);

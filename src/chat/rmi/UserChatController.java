@@ -110,28 +110,65 @@ public class UserChatController implements Initializable {
     }
     
     @FXML
-    void btnJoinAction(ActionEvent event) {
+    void btnJoinAction(ActionEvent event) throws RemoteException {
         
-        String selectedRoom = cmbRooms.getValue();
-        if(selectedRoom != null){
-            String roomName = selectedRoom.toString();
-            try {
-                iRoomChat = (IRoomChat) registry.lookup(Definitions.roomBindPrefix + roomName);
-                iRoomChat.joinRoom(userChat.getUsrName());
-            } catch (RemoteException | NotBoundException ex) {
-                Logger.getLogger(UserChatController.class.getName()).log(Level.SEVERE, null, ex);
+        if(!"none".equals(userChat.getUsrName())){
+            
+            String selectedRoom = cmbRooms.getValue();
+            String myRoom = "";
+            if(iRoomChat != null){
+                    myRoom = iRoomChat.getRoomName();
+            }
+            if(selectedRoom != null && !myRoom.equals(selectedRoom)){
+
+                if(iRoomChat != null){
+                    iRoomChat.leaveRoom(userChat.getUsrName());
+                }
+
+                String roomName = selectedRoom;
+                try {
+                    iRoomChat = (IRoomChat) registry.lookup(Definitions.roomBindPrefix + roomName);
+                    iRoomChat.joinRoom(userChat.getUsrName());
+                } catch (RemoteException | NotBoundException ex) {
+                    Logger.getLogger(UserChatController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else if (myRoom.equals(selectedRoom)){
+                Alert alert;
+                alert = new Alert(Alert.AlertType.WARNING);
+                alert.setContentText("You are already in that room!");
+                alert.show();
+            } else {
+                Alert alert;
+                alert = new Alert(Alert.AlertType.WARNING);
+                alert.setContentText("Select a room!");
+                alert.show();
             }
         } else {
             Alert alert;
             alert = new Alert(Alert.AlertType.WARNING);
-            alert.setContentText("Select a room!");
+            alert.setContentText("Please, inform your Username first!");
             alert.show();
         }
     }
 
     @FXML
     void btnLeaveAction(ActionEvent event) throws RemoteException {
-        iRoomChat.leaveRoom(userChat.getUsrName());
+        if (iRoomChat != null)
+        {
+            iRoomChat.leaveRoom(userChat.getUsrName());
+            
+        }
+        iRoomChat = null;
+    }
+    
+    public IRoomChat getRoomRef(String roomName) throws RemoteException{ 
+        try {
+            IRoomChat stub = (IRoomChat) registry.lookup(Definitions.roomBindPrefix + roomName);
+            return stub;
+        } catch (NotBoundException | AccessException ex) {
+            Logger.getLogger(UserChatController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
     
     void getRoomUsers(String selectedRoomName) throws RemoteException {
@@ -184,7 +221,7 @@ public class UserChatController implements Initializable {
     @FXML
     void btnSendAction(ActionEvent event) {
         String message = txtMsg.getText();
-        if(!message.isEmpty()){
+        if(!message.isEmpty() && iRoomChat != null){
             try {
                 iRoomChat.sendMsg(userChat.getUsrName(), message);
                 txtMsg.setText("");
@@ -210,17 +247,6 @@ public class UserChatController implements Initializable {
             btnSetName.disableProperty().setValue(Boolean.TRUE);
             lblUserName.setText(usrName);
         }
-    }
-    
-    public IRoomChat getRoomRef(String roomName) throws RemoteException
-    { 
-        try {
-            IRoomChat stub = (IRoomChat) registry.lookup(Definitions.roomBindPrefix + roomName);
-            return stub;
-        } catch (NotBoundException | AccessException ex) {
-            Logger.getLogger(UserChatController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
     }
     
     @Override

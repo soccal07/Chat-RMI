@@ -1,6 +1,8 @@
 package chat.rmi;
 
+import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -42,19 +44,18 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
     @Override
     public void joinRoom(String usrName) throws RemoteException {
         
-        List<String> usrsOnline = new ArrayList();
+        /*List<String> usrsOnline = new ArrayList();
         for(IUserChat usr : usrList){
             usrsOnline.add(usr.getUsrName());
         }
         if(usrsOnline.contains(usrName)){
             return; // Usuario não pode entrar duas vezes na mesma sala
-        }
-        
+        }*/
         try {
             IUserChat user = (IUserChat) registry.lookup(Definitions.userBindPrefix + usrName);
             usrList.add(user);
             System.out.println("User " + user.getUsrName() + " joined room " + roomName);
-        } catch (Exception ex) {
+        } catch (NotBoundException | RemoteException ex) {
             Logger.getLogger(RoomChat.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -66,6 +67,7 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
             if(usr.getUsrName().equals(usrName))
             {
                 usrList.remove(usr);
+                System.out.println("User " + usr.getUsrName() + " left room " + roomName);
                 break;
             }
         }
@@ -79,6 +81,11 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
             //leaveRoom(usr.getUsrName());
         }
         usrList = null;
+        try {
+            registry.unbind(Definitions.roomBindPrefix + roomName);
+        } catch (NotBoundException | AccessException ex) {
+            Logger.getLogger(RoomChat.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override

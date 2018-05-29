@@ -56,8 +56,10 @@ public class ServerChatController implements Initializable {
         if(room == null)
             return;
         room.closeRoom();
-        List<IRoomChat> rooms = serverChat.getRooms();
-        boolean a = rooms.remove(room);
+        //List<IRoomChat> rooms = serverChat.getRooms();
+        //boolean a = rooms.remove(room);
+        roomList = serverChat.getRooms();
+        boolean a = roomList.remove(room);
     }
     
     @FXML

@@ -3,14 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/GoingS/Desktop/Chat-RMI/src/chat/rmi/UserChatMain.java</file>
-            <file>file:/C:/Users/GoingS/Desktop/Chat-RMI/src/chat/rmi/ServerChat.java</file>
-            <file>file:/C:/Users/GoingS/Desktop/Chat-RMI/src/chat/rmi/UserChat.java</file>
-            <file>file:/C:/Users/GoingS/Desktop/Chat-RMI/src/chat/rmi/RoomChat.java</file>
-            <file>file:/C:/Users/GoingS/Desktop/Chat-RMI/src/chat/rmi/UserChatController.java</file>
-            <file>file:/C:/Users/GoingS/Desktop/Chat-RMI/src/chat/rmi/ServerChatMain.java</file>
-            <file>file:/C:/Users/GoingS/Desktop/Chat-RMI/src/chat/rmi/ServerChatController.java</file>
-            <file>file:/C:/Users/GoingS/Desktop/Chat-RMI/src/chat/rmi/IRoomChat.java</file>
+            <file>file:/C:/CC/7º%20Semestre/distribuidos/Trab2/Chat-RMI/src/chat/rmi/UserChat.java</file>
+            <file>file:/C:/CC/7º%20Semestre/distribuidos/Trab2/Chat-RMI/src/chat/rmi/RoomChat.java</file>
+            <file>file:/C:/CC/7º%20Semestre/distribuidos/Trab2/Chat-RMI/src/chat/rmi/UserChatController.java</file>
+            <file>file:/C:/CC/7º%20Semestre/distribuidos/Trab2/Chat-RMI/src/chat/rmi/ServerChatController.java</file>
+            <file>file:/C:/CC/7º%20Semestre/distribuidos/Trab2/Chat-RMI/src/chat/rmi/ServerChat.java</file>
         </group>
     </open-files>
 </project-private>

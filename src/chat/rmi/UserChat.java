@@ -8,7 +8,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.TextArea;
-import javax.swing.JTextArea;
 
 
 public class UserChat extends UnicastRemoteObject implements IUserChat{
